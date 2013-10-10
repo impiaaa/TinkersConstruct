@@ -1,12 +1,14 @@
 package tconstruct.common;
 
 import net.minecraftforge.common.EnumHelper;
-
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.*;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
+
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
 import net.minecraft.creativetab.CreativeTabs;
@@ -795,9 +797,9 @@ public class TContent implements IFuelHandler
             TConstructRegistry.addItemStackToDirectory(patternTypes[i] + "Cast", new ItemStack(metalPattern, 1, i));
         }
         String[] armorPartTypes = { "helmet", "chestplate", "leggings", "boots" };
-		for (int i = 1; i < armorPartTypes.length; i++) {
-			TConstructRegistry.addItemStackToDirectory(armorPartTypes[i] + "Cast", new ItemStack(armorPattern, 1, i));
-		}
+        for (int i = 1; i < armorPartTypes.length; i++) {
+            TConstructRegistry.addItemStackToDirectory(armorPartTypes[i] + "Cast", new ItemStack(armorPattern, 1, i));
+        }
 
         manualBook = new Manual(PHConstruct.manual);
         buckets = new FilledBucket(PHConstruct.buckets);
@@ -1285,15 +1287,15 @@ public class TContent implements IFuelHandler
         basinCasting.addCastingRecipe(new ItemStack(Block.whiteStone), new FluidStack(moltenEnderFluid, 25), new ItemStack(Block.obsidian), true, 100); //endstone
         basinCasting.addCastingRecipe(new ItemStack(metalBlock.blockID, 1, 10), new FluidStack(moltenEnderFluid, 1000), null, true, 100); //ender
 
-		//Armor casts
-		basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 0), new FluidStack(moltenAlubrassFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(helmetWood), 50);
-		basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 0), new FluidStack(moltenGoldFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(helmetWood), 50);
-		basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 1), new FluidStack(moltenAlubrassFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(chestplateWood), 50);
-		basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 1), new FluidStack(moltenGoldFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(chestplateWood), 50);
-		basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 2), new FluidStack(moltenAlubrassFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(leggingsWood), 50);
-		basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 2), new FluidStack(moltenGoldFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(leggingsWood), 50);
-		basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 3), new FluidStack(moltenAlubrassFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(bootsWood), 50);
-		basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 3), new FluidStack(moltenGoldFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(bootsWood), 50);
+        //Armor casts
+        basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 0), new FluidStack(moltenAlubrassFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(helmetWood), 50);
+        basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 0), new FluidStack(moltenGoldFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(helmetWood), 50);
+        basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 1), new FluidStack(moltenAlubrassFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(chestplateWood), 50);
+        basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 1), new FluidStack(moltenGoldFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(chestplateWood), 50);
+        basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 2), new FluidStack(moltenAlubrassFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(leggingsWood), 50);
+        basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 2), new FluidStack(moltenGoldFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(leggingsWood), 50);
+        basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 3), new FluidStack(moltenAlubrassFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(bootsWood), 50);
+        basinCasting.addCastingRecipe(new ItemStack(armorPattern, 1, 3), new FluidStack(moltenGoldFluid, TConstruct.ingotLiquidValue * 10), new ItemStack(bootsWood), 50);
         
         //TODO TEST
 //        basinCasting.addCastingRecipe(new ItemStack(armorTest), new FluidStack(moltenIronFluid, TConstruct.ingotLiquidValue * 24), new ItemStack(armorPattern, 1, 0), false, 100, new FluidRenderProperties(0.5F, 0.575F, 0.15F, 0.85F, 0.15F, 0.85F));
@@ -1402,8 +1404,7 @@ public class TContent implements IFuelHandler
         Smeltery.addMelting(new ItemStack(Block.anvil, 1, 1), Block.blockIron.blockID, 8, 800, new FluidStack(moltenIronFluid, TConstruct.ingotLiquidValue * 31));
         Smeltery.addMelting(new ItemStack(Block.anvil, 1, 2), Block.blockIron.blockID, 8, 800, new FluidStack(moltenIronFluid, TConstruct.ingotLiquidValue * 31));
 
-        /* Detailing */
-        Detailing chiseling = TConstructRegistry.getChiselDetailing();
+        chiseling = TConstructRegistry.getChiselDetailing();
         chiseling.addDetailing(Block.stone, 0, Block.stoneBrick, 0, chisel);
         chiseling.addDetailing(speedBlock, 0, speedBlock, 1, chisel);
         chiseling.addDetailing(speedBlock, 2, speedBlock, 3, chisel);
@@ -1921,6 +1922,7 @@ public class TContent implements IFuelHandler
     }
 
     private static boolean initRecipes;
+    private Detailing chiseling;
 
     public static void modRecipes ()
     {
@@ -2176,6 +2178,45 @@ public class TContent implements IFuelHandler
             ItemStack ingot = ores.get(0);
             basinCasting.addCastingRecipe(ingot, new FluidStack(moltenElectrumFluid, TConstruct.ingotLiquidValue * 9), null, 100);
         }
+
+        if (Loader.isModLoaded("Railcraft")) {
+            String[] brickTypes = {"infernal",
+                    "abyssal",
+                    "sandy",
+                    "frostbound",
+                    "bloodstained",
+                    "quarried",
+                    "bleachedbone",
+                    "nether"};
+            for (String brickName : brickTypes) {
+                Block brick = (Block)getStaticItem(brickName, "mods.railcraft.common.blocks.aesthetics.brick.BlockBrick");
+                if (brick != null) {
+                    // block -> fitted
+                    chiseling.addDetailing(brick.blockID, 2, brick.blockID, 1, chisel);
+                    // fitted -> brick
+                    chiseling.addDetailing(brick.blockID, 1, brick.blockID, 0, chisel);
+                    // brick -> etched
+                    chiseling.addDetailing(brick.blockID, 0, brick.blockID, 4, chisel);
+                    // etched -> ornate
+                    chiseling.addDetailing(brick.blockID, 4, brick.blockID, 3, chisel);
+                }
+            }
+            try {
+                Class clazz = Class.forName("mods.railcraft.common.blocks.aesthetics.cube.BlockCube");
+                Method method = clazz.getDeclaredMethod("getBlock");
+                Block cube = (Block)method.invoke(null);
+                
+                int abyssalId = ((Block)getStaticItem("abyssal", "mods.railcraft.common.blocks.aesthetics.brick.BlockBrick")).blockID;
+                int quarriedId = ((Block)getStaticItem("quarried", "mods.railcraft.common.blocks.aesthetics.brick.BlockBrick")).blockID;
+                
+                // stone -> block
+                chiseling.addDetailing(cube.blockID, 6, abyssalId, 2, chisel);
+                chiseling.addDetailing(cube.blockID, 7, quarriedId, 2, chisel);
+            } catch (Exception e) {
+                System.out.println("[TConstruct] Could not find getBlock");
+            }
+            
+        }
     }
 
     public static Object getStaticItem (String name, String classPackage)
@@ -2185,7 +2226,7 @@ public class TContent implements IFuelHandler
             Class clazz = Class.forName(classPackage);
             Field field = clazz.getDeclaredField(name);
             Object ret = field.get(null);
-            if (ret != null && (ret instanceof ItemStack || ret instanceof Item))
+            if (ret != null && (ret instanceof ItemStack || ret instanceof Item || ret instanceof Block))
                 return ret;
             return null;
         }
