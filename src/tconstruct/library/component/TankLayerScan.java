@@ -1,22 +1,11 @@
 package tconstruct.library.component;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.HashSet;
-
+import java.util.*;
 import net.minecraft.block.Block;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagIntArray;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.*;
 import net.minecraft.tileentity.TileEntity;
 import tconstruct.TConstruct;
-import tconstruct.common.TContent;
-import tconstruct.library.util.CoordTuple;
-import tconstruct.library.util.CoordTupleSort;
-import tconstruct.library.util.IFacingLogic;
-import tconstruct.library.util.IMasterLogic;
-import tconstruct.library.util.IServantLogic;
+import tconstruct.library.util.*;
 
 public class TankLayerScan extends LogicComponent
 {
@@ -29,6 +18,7 @@ public class TankLayerScan extends LogicComponent
 
     protected int bricks = 0;
     protected int airBlocks = 0;
+    protected int structureTop = 0;
     protected HashSet<CoordTuple> layerBlockCoords = new HashSet<CoordTuple>();
     protected HashSet<CoordTuple> layerAirCoords = new HashSet<CoordTuple>();
 
@@ -37,7 +27,8 @@ public class TankLayerScan extends LogicComponent
     protected ArrayList<int[]> validAirCoords = new ArrayList<int[]>();
     protected CoordTuple returnStone;
 
-    private boolean debug = false;
+    private static boolean debug = System.getenv("DBG_MANTLE_TankLayerScan") != null;
+    private static int MAX_LAYER_RECURSION_DEPTH = System.getProperty("os.arch").equals("amd64") ? 4000 : 2000; // Recursion causes overflows on 32-bit, so reduce if not 64-bit
 
     public TankLayerScan(TileEntity te, Block... ids)
     {
@@ -50,6 +41,11 @@ public class TankLayerScan extends LogicComponent
         validAirCoords.add(new int[] { -1, 0 });
         validAirCoords.add(new int[] { 0, 1 });
         validAirCoords.add(new int[] { 0, -1 });
+        if (debug)
+        {
+            TConstruct.logger.info("In debug mode: " + this);
+            TConstruct.logger.info("Using recursion size " + MAX_LAYER_RECURSION_DEPTH + " on JVM arch " + System.getProperty("os.arch"));
+        }
     }
 
     public void checkValidStructure ()
@@ -131,7 +127,7 @@ public class TankLayerScan extends LogicComponent
                 if (lowY != -1)
                 {
                     completeStructure = true;
-                    recurseStructureUp(master.yCoord + 1);
+                    structureTop = recurseStructureUp(master.yCoord + 1);
                     finalizeStructure();
 
                     if (!world.isRemote && debug)
@@ -144,8 +140,10 @@ public class TankLayerScan extends LogicComponent
         }
     }
 
+    //@SuppressWarnings({ "unchecked" })
     protected void finalizeStructure ()
     {
+        Collections.sort(blockCoords, new CoordTupleSort());
         Collections.sort(airCoords, new CoordTupleSort());
 
         for (CoordTuple coord : blockCoords)
@@ -189,7 +187,7 @@ public class TankLayerScan extends LogicComponent
     protected boolean checkAir (int x, int y, int z)
     {
         Block block = Block.blocksList[world.getBlockId(x, y, z)];
-        if (block == null || block.isAirBlock(world, x, y, z))// || block == Block.glass)
+        if (block == null || block.isAirBlock(world, x, y, z))// || block == TContent.tankAir)
             return true;
 
         return false;
@@ -213,7 +211,7 @@ public class TankLayerScan extends LogicComponent
 
     protected boolean initialRecurseLayer (int x, int y, int z)
     {
-        if (bricks > 4000)
+        if (bricks > MAX_LAYER_RECURSION_DEPTH)
             return false;
 
         CoordTuple keystone = new CoordTuple(x, y, z);
@@ -256,7 +254,7 @@ public class TankLayerScan extends LogicComponent
 
     protected boolean floodTest (int x, int y, int z)
     {
-        if (airBlocks > 4000)
+        if (airBlocks > MAX_LAYER_RECURSION_DEPTH)
             return false;
 
         for (int[] offset : validAirCoords)
@@ -348,7 +346,7 @@ public class TankLayerScan extends LogicComponent
         return -1;
     }
 
-    public void recurseStructureUp (int y)
+    public int recurseStructureUp (int y)
     {
         Iterator i = layerBlockCoords.iterator();
         if (i.hasNext())
@@ -395,12 +393,81 @@ public class TankLayerScan extends LogicComponent
                     recurseStructureUp(y + 1);
             }
         }
+        return y - 1;
     }
 
     protected void addAirBlock (int x, int y, int z)
     {
         airBlocks++;
         airCoords.add(new CoordTuple(x, y, z));
+    }
+
+    /* Checking for valid structures */
+
+    public void recheckStructure ()
+    {
+        System.out.println("Rechecking structure");
+        int height = -1;
+        for (CoordTuple coord : blockCoords)
+        {
+            TileEntity servant = world.getBlockTileEntity(coord.x, coord.y, coord.z);
+            boolean canPass = false;
+            if (servant instanceof IServantLogic)
+            {
+                canPass = ((IServantLogic) servant).verifyMaster(imaster, world, master.xCoord, master.yCoord, master.zCoord);
+                if (canPass)
+                    continue;
+            }
+            if (!canPass)
+            {
+                System.out.println("Coord: "+coord);
+                height = coord.y;
+                break;
+            }
+        }
+
+        if (height != -1)
+        {
+            if (height <= master.yCoord)
+                invalidateStructure();
+            else
+                invalidateBlocksAbove(height);
+        }
+        else
+        {
+            if (structureTop == 0) //Workaround for missing data
+            {
+                for (CoordTuple coord : blockCoords)
+                    structureTop = coord.y;
+            }
+            structureTop = recurseStructureUp(structureTop + 1);
+            finalizeStructure();
+        }
+    }
+
+    protected void invalidateStructure ()
+    {
+        completeStructure = false;
+        for (CoordTuple coord : blockCoords)
+        {
+            TileEntity servant = world.getBlockTileEntity(coord.x, coord.y, coord.z);
+            if (servant instanceof IServantLogic)
+                ((IServantLogic) servant).invalidateMaster(imaster, world, master.xCoord, master.yCoord, master.zCoord);
+        }
+        master.worldObj.markBlockForUpdate(master.xCoord, master.yCoord, master.zCoord);
+    }
+
+    protected void invalidateBlocksAbove (int height)
+    {
+        for (CoordTuple coord : blockCoords)
+        {
+            if (coord.y < height)
+                continue;
+
+            TileEntity servant = world.getBlockTileEntity(coord.x, coord.y, coord.z);
+            if (servant instanceof IServantLogic)
+                ((IServantLogic) servant).invalidateMaster(imaster, world, master.xCoord, master.yCoord, master.zCoord);
+        }
     }
 
     /** Do any necessary cleanup here. Remove air blocks, invalidate servants, etc */
@@ -418,15 +485,11 @@ public class TankLayerScan extends LogicComponent
         }
     }
 
-    /* @Override
-     public void readFromNBT (NBTTagCompound tags)
-     {
-         super.readFromNBT(tags);
-     }*/
-
-    public void readNetworkNBT (NBTTagCompound tags)
+    /* NBT */
+    @Override
+    public void readFromNBT (NBTTagCompound tags)
     {
-        completeStructure = tags.getBoolean("Complete");
+        super.readFromNBT(tags);
         NBTTagList layerAir = tags.getTagList("AirLayer");
         if (layerAir != null)
         {
@@ -440,7 +503,7 @@ public class TankLayerScan extends LogicComponent
             }
         }
 
-        NBTTagList blocks = tags.getTagList("AirLayer");
+        NBTTagList blocks = tags.getTagList("Blocks");
         if (blocks != null)
         {
             blockCoords.clear();
@@ -453,7 +516,7 @@ public class TankLayerScan extends LogicComponent
             }
         }
 
-        NBTTagList air = tags.getTagList("AirLayer");
+        NBTTagList air = tags.getTagList("Air");
         if (air != null)
         {
             airCoords.clear();
@@ -465,18 +528,18 @@ public class TankLayerScan extends LogicComponent
                 airCoords.add(new CoordTuple(coord[0], coord[1], coord[2]));
             }
         }
-
+        structureTop = tags.getInteger("structureTop");
     }
 
-    /*@Override
+    public void readNetworkNBT (NBTTagCompound tags)
+    {
+        completeStructure = tags.getBoolean("Complete");
+    }
+
+    @Override
     public void writeToNBT (NBTTagCompound tags)
     {
         super.writeToNBT(tags);
-    }*/
-
-    public void writeNetworkNBT (NBTTagCompound tags)
-    {
-        tags.setBoolean("Complete", completeStructure);
         NBTTagList layerAir = new NBTTagList();
         for (CoordTuple coord : layerAirCoords)
         {
@@ -497,5 +560,11 @@ public class TankLayerScan extends LogicComponent
             air.appendTag(new NBTTagIntArray("coord", new int[] { coord.x, coord.y, coord.z }));
         }
         tags.setTag("Air", air);
+        tags.setInteger("structureTop", structureTop);
+    }
+
+    public void writeNetworkNBT (NBTTagCompound tags)
+    {
+        tags.setBoolean("Complete", completeStructure);
     }
 }

@@ -7,13 +7,19 @@ import cpw.mods.fml.common.event.*;
 import cpw.mods.fml.common.network.*;
 import cpw.mods.fml.common.registry.*;
 import cpw.mods.fml.relauncher.Side;
+
+import java.util.logging.Logger;
+
 import net.minecraft.crash.CallableMinecraftVersion;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
+import tconstruct.blocks.SignalBus;
+import tconstruct.client.SignalTetherWorldOverlayRenderer;
 import tconstruct.client.event.EventCloakRender;
 import tconstruct.common.*;
 import tconstruct.library.TConstructRegistry;
 import tconstruct.library.crafting.*;
+import tconstruct.library.multiblock.MultiblockEventHandler;
 import tconstruct.library.util.TabTools;
 import tconstruct.util.*;
 import tconstruct.util.config.*;
@@ -23,20 +29,22 @@ import tconstruct.util.player.TPlayerHandler;
 import tconstruct.worldgen.*;
 import tconstruct.worldgen.village.*;
 
-import java.util.logging.Logger;
-
 /** TConstruct, the tool mod.
  * Craft your tools with style, then modify until the original is gone!
- * @author: mDiyo
- * @dependencies: IC2 API, MFR API
+ * @author mDiyo
  */
 
-@Mod(modid = "TConstruct", name = "TConstruct", version = "1.6.X_1.5.0d", dependencies = "required-after:Forge@[8.9,)")
+@Mod(modid = "TConstruct", name = "TConstruct", version = "1.6.X_1.5.1d", dependencies = "required-after:Forge@[8.9,);after:Mantle-Core;after:Mantle-Router;after:ThermalExpansion")
 @NetworkMod(serverSideRequired = false, clientSideRequired = true, channels = { "TConstruct" }, packetHandler = tconstruct.util.network.TPacketHandler.class)
 public class TConstruct
 {
     /** The value of one ingot in millibuckets */
     public static final int ingotLiquidValue = 144;
+    public static final int oreLiquidValue = ingotLiquidValue * 2;
+    public static final int blockLiquidValue = ingotLiquidValue * 9;
+    public static final int chunkLiquidValue = ingotLiquidValue / 2;
+    public static final int nuggetLiquidValue = ingotLiquidValue / 9;
+
     public static final int liquidUpdateAmount = 6;
 
     // Shared mod logger
@@ -55,25 +63,15 @@ public class TConstruct
         if (Loader.isModLoaded("Natura"))
         {
             TConstruct.logger.info("[TConstruct] Natura, what are we going to do tomorrow night?");
-            if (Loader.isModLoaded("ChaoticBastion"))
-            {
-                TConstruct.logger.info("[Natura] TConstruct, we're going to...");
-                TConstruct.logger.info("[ChaoticBastion] All your base are belong to us!");
-
-            }
-            else
-                TConstruct.logger.info("[Natura] TConstruct, we're going to take over the world!");
+            TConstruct.logger.info("[Natura] TConstruct, we're going to take over the world!");
         }
         else
         {
-            if (Loader.isModLoaded("ChaoticBastion"))
-            {
-                TConstruct.logger.info("[TConstruct] Preparing to...");
-                TConstruct.logger.info("[ChaoticBastion] I'MA FIRING MY LAZOR!");
-            }
-            else
-                TConstruct.logger.info("[TConstruct] Preparing to take over the world");
+
+            TConstruct.logger.info("[TConstruct] Preparing to take over the world");
         }
+
+        EnvironmentChecks.verifyEnvironmentSanity();
     }
 
     @EventHandler
@@ -92,7 +90,6 @@ public class TConstruct
         content = new TContent();
 
         events = new TEventHandler();
-        events.unfuxOreDictionary();
         MinecraftForge.EVENT_BUS.register(events);
         content.oreRegistry();
 
@@ -101,6 +98,8 @@ public class TConstruct
         proxy.addNames();
         proxy.readManuals();
         proxy.registerKeys();
+        
+        MinecraftForge.EVENT_BUS.register(new MultiblockEventHandler());
 
         GameRegistry.registerWorldGenerator(new TBaseWorldGenerator());
         MinecraftForge.TERRAIN_GEN_BUS.register(new TerrainGenEventHandler());
@@ -108,9 +107,12 @@ public class TConstruct
         GameRegistry.registerCraftingHandler(new TCraftingHandler());
         NetworkRegistry.instance().registerGuiHandler(instance, proxy);
 
-        VillagerRegistry.instance().registerVillageTradeHandler(78943, new TVillageTrades());
         if (PHConstruct.addToVillages)
         {
+            // adds to the villager spawner egg
+            VillagerRegistry.instance().registerVillagerId(78943);
+            // moved down, not needed if 'addToVillages' is false
+            VillagerRegistry.instance().registerVillageTradeHandler(78943, new TVillageTrades());
             VillagerRegistry.instance().registerVillageCreationHandler(new VillageToolStationHandler());
             VillagerRegistry.instance().registerVillageCreationHandler(new VillageSmelteryHandler());
             try
@@ -138,6 +140,8 @@ public class TConstruct
         if (event.getSide() == Side.CLIENT)
         {
             MinecraftForge.EVENT_BUS.register(new EventCloakRender());
+            MinecraftForge.EVENT_BUS.register(TConstruct.instance.content.signalBus);
+            MinecraftForge.EVENT_BUS.register(new SignalTetherWorldOverlayRenderer());
         }
 
         content.intermodCommunication();
@@ -150,11 +154,11 @@ public class TConstruct
     @EventHandler
     public void postInit (FMLPostInitializationEvent evt)
     {
-    	proxy.postInit();
+        proxy.postInit();
         Behavior.registerBuiltInBehaviors();
         SpecialStackHandler.registerBuiltInStackHandlers();
         content.modIntegration();
-        TContent.modRecipes();
+        content.addOreDictionarySmelteryRecipes();
         content.createEntities();
         content.modRecipes();
     }

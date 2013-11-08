@@ -47,9 +47,6 @@ public class PHConstruct
         keepHunger = config.get("Difficulty Changes", "Keep hunger on death", true).getBoolean(true);
         keepLevels = config.get("Difficulty Changes", "Keep levels on death", true).getBoolean(true);
         beginnerBook = config.get("Difficulty Changes", "Spawn beginner book", true).getBoolean(true);
-        alphaRegen = config.get("Alpha Behavior", "Regenerate HP from food", false).getBoolean(false);
-        alphaHunger = config.get("Alpha Behavior", "Remove hunger", false).getBoolean(false);
-        
         superfunWorld = config.get("Superfun", "All the world is Superfun", false).getBoolean(false);
 
         enableTWood = config.get("Difficulty Changes", "Enable mod wooden tools", true).getBoolean(true);
@@ -104,7 +101,7 @@ public class PHConstruct
         barricadeSpruce = config.getBlock("Spruce Barricade", 1482).getInt(1482);
         barricadeBirch = config.getBlock("Birch Barricade", 1483).getInt(1483);
         barricadeJungle = config.getBlock("Jungle Barricade", 1487).getInt(1487);
-        
+
         slimeChannel = config.getBlock("Slime Channel", 3190).getInt(3190);
         slimePad = config.getBlock("Slime Pad", 3191).getInt(3191);
 
@@ -178,7 +175,11 @@ public class PHConstruct
         woolSlab1 = config.getBlock("Wool Slab 1", 3244).getInt(3244);
         woolSlab2 = config.getBlock("Wool Slab 2", 3245).getInt(3245);
         airTank = config.getBlock("Air Tank", 3246).getInt(3246);
+        slimeExplosive = config.getBlock("SDX", 3247).getInt(3247);
         castingChannel = config.getBlock("Casting Channel", 3249).getInt(3249);
+        woodenRail = config.getBlock("Wooden Rail", 3250).getInt(3250);
+        signalBus = config.getBlock("Signal Bus", 3251).getInt(3251);
+        signalTerminal = config.getBlock("Signal Terminal", 3252).getInt(3252);
 
         manual = config.getItem("Patterns and Misc", "Tinker's Manual", 14018).getInt(14018);
         blankPattern = config.getItem("Patterns and Misc", "Blank Patterns", 14019).getInt(14019);
@@ -263,6 +264,9 @@ public class PHConstruct
         essenceCrystal = config.getItem("Patterns and Misc", "Essence Crystal", 14114).getInt(14114);
         jerky = config.getItem("Patterns and Misc", "Jerky", 14115).getInt(14115);
 
+        spoolWire = config.getItem("Logic", "SpoolWire", 14120).getInt(14120);
+        lengthWire = config.getItem("Logic", "LengthWire", 14121).getInt(14121);
+        
         boolean ic2 = true;
         boolean xycraft = true;
         try
@@ -359,20 +363,21 @@ public class PHConstruct
         Property conTexMode = config.get("Looks", "Connected Textures Enabled", true);
         conTexMode.comment = "0 = disabled, 1 = enabled, 2 = enabled + ignore stained glass meta";
         connectedTexturesMode = conTexMode.getInt(2);
-        
-        //dimension blacklist
-        cfgDimBlackList = config.get("DimBlackList", "SlimeIslandDimBlacklist",new int[]{}).getIntList();
-        slimeIslGenDim0Only = config.get("DimBlackList","GenerateSlimeIslandInDim0Only" , false).getBoolean(false);
-        slimeIslGenDim0 = config.get("DimBlackList", "slimeIslGenDim0", true).getBoolean(true);
 
+        //dimension blacklist
+        cfgDimBlackList = config.get("DimBlackList", "SlimeIslandDimBlacklist", new int[] {},"Add dimension ID's to prevent slime islands from generating in them").getIntList();
+        slimeIslGenDim0Only = config.get("DimBlackList", "GenerateSlimeIslandInDim0Only", false,"True: slime islands wont generate in any ages other than overworld(if enabled); False: will generate in all non-blackisted ages").getBoolean(false);
+        slimeIslGenDim0 = config.get("DimBlackList", "slimeIslGenDim0", true,"True: slime islands generate in overworld; False they do not generate").getBoolean(true);
+        genIslandsFlat = config.get("DimBlacklist", "genIslandsFlat", false, "Generate slime islands in flat worlds").getBoolean(false);
 
         //Experimental functionality
         throwableSmeltery = config.get("Experimental", "Items can be thrown into smelteries", true).getBoolean(true);
-        
+        newSmeltery = config.get("Experimental", "Use new adaptive Smeltery code", false, "Warning: Very buggy").getBoolean(false);
+
         //Addon stuff
         isCleaverTwoHanded = config.get("Battlegear", "Can Cleavers have shields", true).getBoolean(true);
         isHatchetWeapon = config.get("Battlegear", "Are Hatches also weapons", true).getBoolean(true);
-        
+
         /* Save the configuration file */
         config.save();
 
@@ -399,7 +404,7 @@ public class PHConstruct
     public static int searedTable;
     public static int castingChannel;
     public static int airTank;
-    
+
     public static int craftedSoil;
     public static int oreSlag;
     public static int oreGravel;
@@ -407,6 +412,11 @@ public class PHConstruct
 
     public static int redstoneMachine;
     public static int dryingRack;
+
+    public static int woodenRail;
+    
+    public static int signalBus;
+    public static int signalTerminal;
 
     //Crops
     public static int oreBerry;
@@ -420,6 +430,7 @@ public class PHConstruct
     public static int barricadeSpruce;
     public static int barricadeBirch;
     public static int barricadeJungle;
+    public static int slimeExplosive;
 
     //InfiBlocks
     public static int speedBlock;
@@ -469,7 +480,7 @@ public class PHConstruct
     public static int slimeTallGrass;
     public static int slimeLeaves;
     public static int slimeSapling;
-    
+
     public static int slimeChannel;
     public static int slimePad;
 
@@ -574,6 +585,9 @@ public class PHConstruct
     public static int knapsack;
 
     public static int heartCanister;
+    
+    public static int spoolWire;
+    public static int lengthWire;
 
     //Ore values
     public static boolean generateCopper;
@@ -697,12 +711,13 @@ public class PHConstruct
     public static boolean slimeIslGenDim0Only;
     public static int[] cfgDimBlackList;
     public static boolean slimeIslGenDim0;
+    public static boolean genIslandsFlat;
 
     //Experimental functionality
     public static boolean throwableSmeltery;
-    
-    
+    public static boolean newSmeltery;
+
     //Addon stuff
     public static boolean isCleaverTwoHanded;
-	public static boolean isHatchetWeapon;
+    public static boolean isHatchetWeapon;
 }

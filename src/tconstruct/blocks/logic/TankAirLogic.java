@@ -33,8 +33,8 @@ public class TankAirLogic extends InventoryLogic implements IServantLogic, ISide
     
     public void overrideFluids(ArrayList<FluidStack> fluids)
     {
-        multitank.overrideFluids(fluids);
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        /*multitank.overrideFluids(fluids);
+        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);*/
     }
     
     public boolean hasItem()
@@ -55,13 +55,13 @@ public class TankAirLogic extends InventoryLogic implements IServantLogic, ISide
     @Override
     public void setInventorySlotContents (int slot, ItemStack itemstack)
     {
-        inventory[slot] = itemstack;
+        /*inventory[slot] = itemstack;
         if (itemstack != null && itemstack.stackSize > getInventoryStackLimit())
         {
             itemstack.stackSize = getInventoryStackLimit();
-            worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, itemstack == null ? 0 : itemstack.getItemDamage(), 3);
+            worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, itemstack.getItemDamage(), 3);
             worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-        }
+        }*/
     }
 
     @Override
@@ -97,8 +97,8 @@ public class TankAirLogic extends InventoryLogic implements IServantLogic, ISide
     @Override
     public boolean verifyMaster (IMasterLogic logic, World world, int xMaster, int yMaster, int zMaster)
     {
-        if (master != null)
-            return false;
+        /*if (master != null) //Is this even needed?
+            return false;*/
 
         master = new CoordTuple(xMaster, yMaster, zMaster);
         return true;
@@ -128,10 +128,16 @@ public class TankAirLogic extends InventoryLogic implements IServantLogic, ISide
         return false;
     }
     
-    @Override
+    /*@Override
     public boolean canUpdate()
     {
         return false;
+    }*/
+    
+    //DELETE
+    public void updateEntity ()
+    {
+        worldObj.setBlockToAir(xCoord, yCoord, zCoord);
     }
     
     //Keep TE regardless of metadata
@@ -145,7 +151,7 @@ public class TankAirLogic extends InventoryLogic implements IServantLogic, ISide
     @Override
     public void readFromNBT (NBTTagCompound tags)
     {
-        super.superReadFromNBT(tags);
+        super.readFromNBT(tags);
         readNetworkNBT(tags);
         multitank.readFromNBT(tags);
     }
@@ -159,7 +165,7 @@ public class TankAirLogic extends InventoryLogic implements IServantLogic, ISide
     @Override
     public void writeToNBT (NBTTagCompound tags)
     {
-        super.superWriteToNBT(tags);
+        super.writeToNBT(tags);
         writeNetworkNBT(tags);
         multitank.writeToNBT(tags);
     }
@@ -175,6 +181,7 @@ public class TankAirLogic extends InventoryLogic implements IServantLogic, ISide
     {
         readNetworkNBT(packet.data);
         worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
+        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }
 
     @Override

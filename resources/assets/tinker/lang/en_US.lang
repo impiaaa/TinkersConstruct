@@ -25,6 +25,8 @@ CraftedSoil.BlueSlime.name=Slimy Mud
 CraftedSoil.GraveyardSoil.name=Graveyard Soil
 CraftedSoil.ConsecratedSoil.name=Consecrated Soil
 tile.CastingChannel.name=Casting Channel
+tile.slime.channel.name=Slime Channel
+tile.slime.pad.name=Bounce Pad
 
 MetalOre.NetherSlag.name=Netherack Slag
 MetalOre.Cobalt.name=Cobalt Ore
@@ -96,6 +98,11 @@ block.fancybrick.obsidian.ingot.name=Fancy Obsidian Brick
 block.fancybrick.stone.road.name=Stone Road
 block.fancybrick.stone.name=Fancy Stone Brick
 
+tile.rail.wood.name=Wooden Rail
+
+tile.signalbus.name=Signal Bus
+tile.signalterminal.name=Signal Terminal
+
 tile.cloth.white.slab.name=Wool Slab
 tile.cloth.orange.slab.name=Orange Wool Slab
 tile.cloth.magenta.slab.name=Magenta Wool Slab
@@ -121,7 +128,10 @@ item.oreberry.aluminum.name=Aluminum Oreberry
 item.oreberry.essence.name=Concentrated Essence Berry
 
 item.goldenhead.name=Golden Head
-item.tconstruct.titleicon.name=Spawn 
+item.tconstruct.titleicon.name=Spawn
+
+item.spoolwire.name=Spool of Wire
+item.lengthwire.name=Length of Wire
 
 item.InfiTool.Pickaxe.name=Pickaxe
 item.InfiTool.Shovel.name=Shovel
@@ -240,6 +250,11 @@ item.tconstruct.ArmorPattern.chestplate.name=Chestplate Cast
 item.tconstruct.ArmorPattern.leggings.name=Leggings Cast
 item.tconstruct.ArmorPattern.boots.name=Boots Cast
 
+item.tconstruct.helmetWood.name=Wooden Helmet
+item.tconstruct.chestplateWood.name=Wooden Chestplate
+item.tconstruct.leggingsWood.name=Wooden Leggings
+item.tconstruct.bootsWood.name=Wooden Boots
+
 item.tconstruct.jerky.beef.name=Beef Jerky
 item.tconstruct.jerky.pig.name=Bacon Jerky
 item.tconstruct.jerky.chicken.name=Chicken Jerky
@@ -268,6 +283,7 @@ LavaTank.Window.name=Seared Window
 
 block.drawbridge.name=Drawbridge
 block.firestarter.name=Igniter
+block.advdrawbridge.name=Advanced Drawbridge
 tile.landmine.name=Landmine
 
 tile.trap.punji.name=Punji Stick
@@ -276,6 +292,7 @@ tile.trap.barricade.spruce.name=Spruce Barricade
 tile.trap.barricade.birch.name=Birch Barricade
 tile.trap.barricade.jungle.name=Jungle Barricade
 tile.extractor.essence.name=Essence Extractor
+tile.explosive.slime.name=SDX
 
 StorageMetals.Cobalt.name=Block of Cobalt
 StorageMetals.Ardite.name=Block of Ardite
@@ -297,7 +314,7 @@ block.glass.pure.name=Clear Glass
 block.glass.soul.name=Soul Glass
 block.glass.soul.pure.name=Clear Soul Glass
 
-block.glass.pure.pane.name=Clear Pane
+block.glass.pure.pane.name=Clear Glass Pane
 block.glass.soul.pane.name=Soul Pane
 block.glass.soul.pane.pure.name=Clear Soul Pane
 
@@ -429,7 +446,8 @@ tile.metal.molten.lead.name=Molten Lead
 tile.metal.molten.shiny.name=Molten Shiny
 tile.metal.molten.invar.name=Molten Invar
 tile.metal.molten.Electrum.name=Molten Electrum
-tile.liquid.ender.name=Liquified Ender
+tile.fluid.ender.name=Liquified Ender
+tile.liquid.slime.name=Liquified Slime
 
 LiquidMetal.Iron.name=Molten Iron
 LiquidMetal.Gold.name=Molten Gold
@@ -480,6 +498,9 @@ death.two.smeltery=%1$s has fused with the Smeltery
 death.three.smeltery=%1$s will be a stepping stone for our revolution!
 death.four.smeltery=%1$s thought swimming in hot liquids was a good idea
 
+death.attack.Landmine=%1$s watched their legs get blown off by a landmine
+death.attack.FireworkExplode=%1$s was torn apart by a wild firework explosion
+
 parttype.wood=Wooden
 parttype.stone=Stone
 parttype.iron=Iron
@@ -500,32 +521,32 @@ parttype.steel=Steel
 parttype.blueslime=Slime
 parttype.thaumium=Thaumium
 
-toolpart.ToolRod=Tool Rod
-toolpart.PickHead=Pickaxe Head
-toolpart.ShovelHead=Shovel Head
-toolpart.AxeHead=Axe Head
-toolpart.Binding=Binding
-toolpart.ToughBind=Tough Binding
-toolpart.ToughRod=Tough Rod
-toolpart.LargePlate=Large Plate
-toolpart.SwordBlade=Sword Blade
-toolpart.LargeGuard=Wide Guard
-toolpart.MediumGuard=Hand Guard
-toolpart.Crossbar=Crossbar
-toolpart.KnifeBlade=Knife Blade
-toolpart.FullGuard=Full Guard
-toolpart.FrypanHead=Pan
-toolpart.SignHead=Sign Head
-toolpart.ChiselHead=Chisel Head
-toolpart.ScytheHead=Scythe Head
-toolpart.LumberHead=Broad Axe Head
-toolpart.ExcavatorHead=Excavator Head
-toolpart.ToolShard=Shard
-toolpart.LargeSwordBlade=Large Sword Blade
-toolpart.HammerHead=Hammer Head
-toolpart.Bowstring=Bowstring
-toolpart.ArrowHead=Arrowhead
-toolpart.Fletching=Fletching
+toolpart.ToolRod=%%material Tool Rod
+toolpart.PickHead=%%material Pickaxe Head
+toolpart.ShovelHead=%%material Shovel Head
+toolpart.AxeHead=%%material Axe Head
+toolpart.Binding=%%material Binding
+toolpart.ToughBind=%%material Tough Binding
+toolpart.ToughRod=%%material Tough Rod
+toolpart.LargePlate=%%material Large Plate
+toolpart.SwordBlade=%%material Sword Blade
+toolpart.LargeGuard=%%material Wide Guard
+toolpart.MediumGuard=%%material Hand Guard
+toolpart.Crossbar=%%material Crossbar
+toolpart.KnifeBlade=%%material Knife Blade
+toolpart.FullGuard=%%material Full Guard
+toolpart.FrypanHead=%%material Pan
+toolpart.SignHead=%%material Sign Head
+toolpart.ChiselHead=%%material Chisel Head
+toolpart.ScytheHead=%%material Scythe Head
+toolpart.LumberHead=%%material Broad Axe Head
+toolpart.ExcavatorHead=%%material Excavator Head
+toolpart.ToolShard=%%material Shard
+toolpart.LargeSwordBlade=%%material Large Sword Blade
+toolpart.HammerHead=%%material Hammer Head
+toolpart.Bowstring=%%material Bowstring
+toolpart.ArrowHead=%%material Arrowhead
+toolpart.Fletching=%%material Fletching
 
 fluid.iron.molten=Molten Iron
 fluid.gold.molten=Molten Gold
@@ -551,3 +572,4 @@ fluid.platinum.molten=Molten Platinum
 fluid.invar=Molten Invar
 fluid.shiny=Molten Shiny
 fluid.ender=Liquid Ender
+fluid.slime.blue=Liquid Blueslime

@@ -14,7 +14,7 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.model.ModelSlime;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.settings.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
@@ -26,22 +26,29 @@ import net.minecraftforge.fluids.RenderBlockFluid;
 import org.lwjgl.opengl.GL11;
 import org.w3c.dom.Document;
 import tconstruct.TConstruct;
+import tconstruct.blocks.SignalTerminal;
+import tconstruct.blocks.SlimeExplosive;
 import tconstruct.blocks.logic.*;
 import tconstruct.client.armor.RenderArmorCast;
 import tconstruct.client.block.*;
 import tconstruct.client.entity.*;
+import tconstruct.client.entity.item.ExplosiveRender;
 import tconstruct.client.entity.projectile.*;
 import tconstruct.client.gui.*;
 import tconstruct.client.pages.*;
 import tconstruct.client.tabs.*;
 import tconstruct.common.*;
 import tconstruct.entity.*;
+import tconstruct.entity.item.*;
+import tconstruct.entity.item.*;
 import tconstruct.entity.projectile.*;
 import tconstruct.inventory.ContainerLandmine;
 import tconstruct.library.TConstructRegistry;
 import tconstruct.library.client.*;
 import tconstruct.library.crafting.ToolBuilder;
+import tconstruct.library.multiblock.MultiblockServerTickHandler;
 import tconstruct.library.tools.ToolCore;
+import tconstruct.util.config.PHConstruct;
 import tconstruct.util.player.*;
 
 public class TProxyClient extends TProxyCommon
@@ -66,7 +73,12 @@ public class TProxyClient extends TProxyCommon
         if (ID == frypanGuiID)
             return new FrypanGui(player.inventory, (FrypanLogic) world.getBlockTileEntity(x, y, z), world, x, y, z);
         if (ID == smelteryGuiID)
-            return new AdaptiveSmelteryGui(player.inventory, (AdaptiveSmelteryLogic) world.getBlockTileEntity(x, y, z), world, x, y, z);
+        {
+            if (PHConstruct.newSmeltery)
+                return new AdaptiveSmelteryGui(player.inventory, (AdaptiveSmelteryLogic) world.getBlockTileEntity(x, y, z), world, x, y, z);
+            else
+                return new SmelteryGui(player.inventory, (SmelteryLogic) world.getBlockTileEntity(x, y, z), world, x, y, z);
+        }
         if (ID == stencilTableID)
             return new StencilTableGui(player.inventory, (StencilTableLogic) world.getBlockTileEntity(x, y, z), world, x, y, z);
         if (ID == toolForgeID)
@@ -78,7 +90,7 @@ public class TProxyClient extends TProxyCommon
         if (ID == craftingStationID)
             return new CraftingStationGui(player.inventory, (CraftingStationLogic) world.getBlockTileEntity(x, y, z), x, y, z);
         if (ID == advDrawbridgeID)
-        	return new AdvDrawbridgeGui(player, (AdvancedDrawbridgeLogic) world.getBlockTileEntity(x, y, z), world, x, y, z);
+            return new AdvDrawbridgeGui(player, (AdvancedDrawbridgeLogic) world.getBlockTileEntity(x, y, z), world, x, y, z);
 
         if (ID == manualGuiID)
         {
@@ -187,6 +199,7 @@ public class TProxyClient extends TProxyCommon
         // TickRegistry.registerTickHandler(new TimeTicker(), Side.CLIENT);
         // TickRegistry.registerTickHandler(new TCommonTickHandler(),
         // Side.CLIENT);
+        TickRegistry.registerScheduledTickHandler(new MultiblockServerTickHandler(), Side.SERVER);
     }
 
     /* Registers any rendering code. */
@@ -213,6 +226,11 @@ public class TProxyClient extends TProxyCommon
         RenderingRegistry.registerBlockHandler(new BlockRenderCastingChannel());
         RenderingRegistry.registerBlockHandler(new SlimeChannelRender());
         RenderingRegistry.registerBlockHandler(new SlimePadRender());
+        RenderingRegistry.registerBlockHandler(new SignalBusRender());
+        RenderingRegistry.registerBlockHandler(new SignalTerminalRender());
+        
+        if (!PHConstruct.newSmeltery)
+            RenderingRegistry.registerBlockHandler(new SmelteryRender());
 
         // Special Renderers
         ClientRegistry.bindTileEntitySpecialRenderer(CastingTableLogic.class, new CastingTableSpecialRenderer());
@@ -230,6 +248,8 @@ public class TProxyClient extends TProxyCommon
         RenderingRegistry.registerEntityRenderingHandler(LaunchedPotion.class, new LaunchedItemRender(Item.potion, 16384));
         RenderingRegistry.registerEntityRenderingHandler(DaggerEntity.class, new DaggerRenderCustom());
         RenderingRegistry.registerEntityRenderingHandler(ArrowEntity.class, new ArrowRenderCustom());
+        RenderingRegistry.registerEntityRenderingHandler(EntityLandmineFirework.class, new RenderSnowball(Item.firework));
+        RenderingRegistry.registerEntityRenderingHandler(ExplosivePrimed.class, new ExplosiveRender());
         // RenderingRegistry.registerEntityRenderingHandler(net.minecraft.entity.player.EntityPlayer.class,
         // new PlayerArmorRender()); // <-- Works, woo!
 
@@ -940,10 +960,11 @@ public class TProxyClient extends TProxyCommon
             return null;
         }
     }
-    
+
     @Override
-	public void postInit() {
-		MinecraftForgeClient.registerItemRenderer(TContent.armorPattern.itemID, new RenderArmorCast());
-	}
-    
+    public void postInit ()
+    {
+        MinecraftForgeClient.registerItemRenderer(TContent.armorPattern.itemID, new RenderArmorCast());
+    }
+
 }
