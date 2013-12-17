@@ -3,14 +3,14 @@
     "modid": "TConstruct",
     "name": "Tinkers' Construct",
     "description": "A little of this, a little of that, a lot of tinkering, and a lot of tools",
-    "version": "@VERSION@",
-    "mcversion": "@MCVERSION@",
+    "version": "${version}",
+    "mcversion": "${MCversion}",
     "url": "http://www.minecraftforum.net/topic/1659892-tinkers-construct",
     "updateUrl": "",
     "authors": [
       "mDiyo", "fuj1n", "ProgWML6", "Sunstrike", "Pillbox"
     ],
-    "credits": "Slime Knights, Samtrion",
+    "credits": "Slime Knights, Samtrion, Abculatter_2",
     "logoFile": "",
     "screenshots": [],
     "parent":"",
@@ -21,7 +21,7 @@
     "name": "Tinkers Corestruct",
     "description": "Preloader for Tinkers Construct",
     "version": "0.0.1",
-    "mcversion": "@MCVERSION@",
+    "mcversion": "${MCversion}",
     "url": "https://github.com/SlimeKnights/TinkersConstruct/tree/master/src/tconstruct/preloader",
     "updateUrl": "",
     "authors": [
@@ -32,62 +32,5 @@
     "screenshots": [],
     "parent":"",
     "dependencies": []
-  },
-  {
-    "modid": "TConstruct|CompatMineFactoryReloaded",
-    "name": "TConstruct Compat: MFR",
-    "description": "TConstruct support for Minefactory Reloaded",
-    "version": "@VERSION@",
-    "mcversion": "@MCVERSION@",
-    "url": "http://www.minecraftforum.net/topic/1659892-tinkers-construct",
-    "updateUrl": "",
-    "authors": [
-      "mDiyo", "fuj1n", "ProgWML6", "Sunstrike", "Pillbox"
-    ],
-    "credits": "Slime Knights",
-    "logoFile": "",
-    "screenshots": [],
-    "parent":"TConstruct",
-    "dependencies": [
-      "TConstruct"
-    ]
-  },
-  {
-    "modid": "TConstruct|CompatForgeMuliPart",
-    "name": "TConstruct Compat: FMP",
-    "description": "TConstruct support for forgemultipart",
-    "version": "@VERSION@",
-    "mcversion": "@MCVERSION@",
-    "url": "http://www.minecraftforum.net/topic/1659892-tinkers-construct",
-    "updateUrl": "",
-    "authors": [
-      "mDiyo", "fuj1n", "ProgWML6", "Sunstrike", "Pillbox"
-    ],
-    "credits": "Slime Knights",
-    "logoFile": "",
-    "screenshots": [],
-    "parent":"TConstruct",
-    "dependencies": [
-      "TConstruct"
-    ]
-  },
-  {
-    "modid": "TConstruct|CompatWaila",
-    "name": "TConstruct Compat: Waila",
-    "description": "TConstruct support for Waila",
-    "version": "@VERSION@",
-    "mcversion": "@MCVERSION@",
-    "url": "http://www.minecraftforum.net/topic/1659892-tinkers-construct",
-    "updateUrl": "",
-    "authors": [
-      "mDiyo", "fuj1n", "ProgWML6", "Sunstrike", "Pillbox"
-    ],
-    "credits": "Slime Knights, Samtrion",
-    "logoFile": "",
-    "screenshots": [],
-    "parent":"TConstruct",
-    "dependencies": [
-      "TConstruct"
-    ]
   }
 ]
